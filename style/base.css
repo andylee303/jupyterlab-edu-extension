@@ -42,13 +42,25 @@
 }
 
 .jp-edu-login-btn,
-.jp-edu-logout-btn {
+.jp-edu-logout-btn,
+.jp-edu-config-btn {
   padding: 6px 16px;
   border: none;
   border-radius: var(--edu-border-radius);
   cursor: pointer;
   font-size: 13px;
   transition: all 0.2s ease;
+}
+
+.jp-edu-config-btn {
+  background: var(--edu-surface-color);
+  border: 1px solid var(--edu-border-color);
+  margin-left: 4px;
+}
+
+.jp-edu-config-btn:hover {
+  background: var(--edu-primary-light);
+  color: white;
 }
 
 .jp-edu-login-btn {

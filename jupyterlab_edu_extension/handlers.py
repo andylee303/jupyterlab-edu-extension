@@ -454,7 +454,7 @@ class ConfigSaveHandler(BaseExtensionHandler):
         body = self.get_json_body()
         
         openai_api_key = body.get("openai_api_key", "").strip()
-        openai_model = body.get("openai_model", "gpt-5-mini").strip()
+        openai_model = body.get("openai_model", "gpt-5-nano").strip()
         supabase_url = body.get("supabase_url", "").strip()
         supabase_anon_key = body.get("supabase_anon_key", "").strip()
         supabase_service_role_key = body.get("supabase_service_role_key", "").strip()

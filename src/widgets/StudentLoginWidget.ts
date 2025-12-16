@@ -48,6 +48,7 @@ export class StudentLoginWidget extends Widget {
           👤 ${state.student.name} (${state.student.studentId})
         </span>
         <button class="jp-edu-logout-btn" title="登出">登出</button>
+        <button class="jp-edu-config-btn" title="擴展設定">⚙️</button>
       `;
 
             // 綁定登出按鈕事件
@@ -55,15 +56,34 @@ export class StudentLoginWidget extends Widget {
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', () => this.handleLogout());
             }
+
+            // 綁定設定按鈕事件
+            const configBtn = this.statusElement.querySelector('.jp-edu-config-btn');
+            if (configBtn) {
+                configBtn.addEventListener('click', async () => {
+                    const { ConfigurationWidget } = await import('./ConfigurationWidget');
+                    ConfigurationWidget.showConfigDialog();
+                });
+            }
         } else {
             this.statusElement.innerHTML = `
         <button class="jp-edu-login-btn">📝 學生登入</button>
+        <button class="jp-edu-config-btn" title="擴展設定">⚙️</button>
       `;
 
             // 綁定登入按鈕事件
             const loginBtn = this.statusElement.querySelector('.jp-edu-login-btn');
             if (loginBtn) {
                 loginBtn.addEventListener('click', () => this.showLoginDialog());
+            }
+
+            // 綁定設定按鈕事件
+            const configBtn = this.statusElement.querySelector('.jp-edu-config-btn');
+            if (configBtn) {
+                configBtn.addEventListener('click', async () => {
+                    const { ConfigurationWidget } = await import('./ConfigurationWidget');
+                    ConfigurationWidget.showConfigDialog();
+                });
             }
         }
     }

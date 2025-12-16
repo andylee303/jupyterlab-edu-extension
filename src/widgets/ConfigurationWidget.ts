@@ -29,8 +29,8 @@ export class ConfigurationWidget {
                     <label for="openai-model">模型</label>
                     <select id="openai-model">
                         <option value="gpt-4o-mini">gpt-4o-mini（經濟實惠）</option>
-                        <option value="gpt-5-mini" selected>gpt-5-mini（推薦）</option>
-                        <option value="gpt-5.1-nano">gpt-5.1-nano（最新）</option>
+                        <option value="gpt-5-nano" selected>gpt-5-nano（推薦）</option>
+                        <option value="gpt-5-mini">gpt-5-mini（進階）</option>
                         <option value="gpt-5">gpt-5（最強）</option>
                     </select>
                 </div>
@@ -81,9 +81,18 @@ export class ConfigurationWidget {
 
             // 儲存到後端
             try {
+                // 取得 XSRF token
+                const xsrfToken = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('_xsrf='))
+                    ?.split('=')[1] || '';
+
                 const response = await fetch('/edu-extension/api/config/save', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-XSRFToken': xsrfToken,
+                    },
                     body: JSON.stringify({
                         openai_api_key: openaiKey,
                         openai_model: openaiModel,

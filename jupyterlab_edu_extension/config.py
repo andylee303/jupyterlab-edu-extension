@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     # OpenAI 配置
     openai_api_key: str = Field(default="", description="OpenAI API Key")
-    openai_model: str = Field(default="gpt-5-mini", description="OpenAI 模型名稱")
+    openai_model: str = Field(default="gpt-5-nano", description="OpenAI 模型名稱")
 
     # 應用程式配置
     app_debug: bool = Field(default=False, description="除錯模式")
