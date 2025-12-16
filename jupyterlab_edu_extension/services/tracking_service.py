@@ -38,7 +38,11 @@ class TrackingService:
         Returns:
             記錄 ID，或 None 如果失敗
         """
-        supabase = await get_supabase()
+        try:
+            supabase = await get_supabase()
+        except ValueError as e:
+            print(f"[TrackingService] Supabase 未設定: {e}")
+            return None
 
         try:
             result = await supabase.table("execution_logs").insert({
@@ -76,7 +80,10 @@ class TrackingService:
         Returns:
             記錄 ID，或 None 如果失敗
         """
-        supabase = await get_supabase()
+        try:
+            supabase = await get_supabase()
+        except ValueError:
+            return None
 
         try:
             result = await supabase.table("chat_logs").insert({
