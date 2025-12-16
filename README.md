@@ -34,7 +34,7 @@ curl -sSL https://raw.githubusercontent.com/andylee303/jupyterlab-edu-extension/
 
 ```bash
 # 1. 安裝擴展
-pip install jupyterlab jupyterlab-edu-extension
+pip install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git
 
 # 2. 啟動（允許遠端連線）
 jupyter lab --ip=0.0.0.0 --no-browser
@@ -62,7 +62,7 @@ irm https://raw.githubusercontent.com/andylee303/jupyterlab-edu-extension/main/s
 2. 開啟 PowerShell，執行：
 
 ```powershell
-pip install jupyterlab jupyterlab-edu-extension
+pip install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git
 jupyter lab
 ```
 
@@ -85,7 +85,7 @@ curl -sSL https://raw.githubusercontent.com/andylee303/jupyterlab-edu-extension/
 brew install python@3.11
 
 # 安裝擴展
-pip3 install jupyterlab jupyterlab-edu-extension
+pip3 install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git
 
 # 啟動
 jupyter lab
@@ -109,7 +109,7 @@ curl -sSL https://raw.githubusercontent.com/andylee303/jupyterlab-edu-extension/
 sudo apt update && sudo apt install python3.11 python3.11-venv -y
 
 # 安裝擴展
-pip3 install jupyterlab jupyterlab-edu-extension
+pip3 install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git
 
 # 啟動
 jupyter lab

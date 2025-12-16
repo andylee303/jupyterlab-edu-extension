@@ -61,7 +61,7 @@ python -m pip install --upgrade pip --quiet
 # 安裝擴展
 Write-Host ""
 Write-Host "📥 安裝 JupyterLab 教學擴展..." -ForegroundColor Yellow
-pip install jupyterlab jupyterlab-edu-extension --quiet
+pip install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git --quiet
 
 # 建立啟動腳本
 Write-Host ""

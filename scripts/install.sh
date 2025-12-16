@@ -72,7 +72,7 @@ pip install --upgrade pip --quiet
 # 安裝擴展
 echo ""
 echo "📥 安裝 JupyterLab 教學擴展..."
-pip install jupyterlab jupyterlab-edu-extension --quiet
+pip install jupyterlab git+https://github.com/andylee303/jupyterlab-edu-extension.git --quiet
 
 # 建立啟動腳本
 echo ""
