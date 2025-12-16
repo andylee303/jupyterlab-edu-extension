@@ -98,9 +98,52 @@ echo ""
 echo "🔑 首次啟動時，請在瀏覽器中設定 OpenAI API Key"
 echo ""
 
-# 詢問是否立即啟動
-read -p "是否現在啟動 JupyterLab? (y/n) " -n 1 -r
+# 詢問是否設定開機自動啟動
+read -p "是否設定開機自動啟動 JupyterLab? (y/n) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    ./start.sh
+    # 建立 systemd 服務
+    sudo tee /etc/systemd/system/jupyterlab.service > /dev/null << SYSTEMD
+[Unit]
+Description=JupyterLab 教學擴展
+After=network.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=$INSTALL_DIR
+ExecStart=$INSTALL_DIR/.venv/bin/jupyter lab --ip=0.0.0.0 --no-browser --NotebookApp.token='' --NotebookApp.password=''
+Restart=on-failure
+RestartSec=10
+Environment=PATH=$INSTALL_DIR/.venv/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target
+SYSTEMD
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable jupyterlab
+    sudo systemctl start jupyterlab
+    
+    echo ""
+    echo "✅ 已設定開機自動啟動！"
+    echo ""
+    echo "📋 管理指令："
+    echo "   查看狀態：sudo systemctl status jupyterlab"
+    echo "   停止服務：sudo systemctl stop jupyterlab"
+    echo "   重新啟動：sudo systemctl restart jupyterlab"
+    echo "   取消開機啟動：sudo systemctl disable jupyterlab"
+    echo ""
+    
+    # 取得 IP 地址
+    IP=$(hostname -I | awk '{print $1}')
+    echo "🌐 JupyterLab 已在背景執行！"
+    echo "   請在電腦瀏覽器開啟: http://$IP:8888"
+else
+    # 詢問是否立即啟動
+    read -p "是否現在啟動 JupyterLab? (y/n) " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        ./start.sh
+    fi
 fi
