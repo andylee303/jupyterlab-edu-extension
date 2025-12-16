@@ -1,0 +1,7 @@
+{
+    "ServerApp": {
+        "jpserver_extensions": {
+            "jupyterlab_edu_extension": true
+        }
+    }
+}

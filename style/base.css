@@ -1,0 +1,555 @@
+/**
+ * JupyterLab 教學擴展樣式
+ */
+
+/* ===== 共用變數 ===== */
+:root {
+  --edu-primary-color: #1976d2;
+  --edu-primary-light: #42a5f5;
+  --edu-primary-dark: #1565c0;
+  --edu-success-color: #4caf50;
+  --edu-error-color: #f44336;
+  --edu-warning-color: #ff9800;
+  --edu-background-color: #ffffff;
+  --edu-surface-color: #f5f5f5;
+  --edu-text-primary: #212121;
+  --edu-text-secondary: #757575;
+  --edu-border-color: #e0e0e0;
+  --edu-border-radius: 8px;
+  --edu-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 學生登入 Widget ===== */
+.jp-edu-login-widget {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 100%;
+}
+
+.jp-edu-login-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jp-edu-student-info {
+  font-size: 13px;
+  color: var(--edu-text-primary);
+  background: var(--edu-surface-color);
+  padding: 4px 12px;
+  border-radius: var(--edu-border-radius);
+}
+
+.jp-edu-login-btn,
+.jp-edu-logout-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: var(--edu-border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.jp-edu-login-btn {
+  background: var(--edu-primary-color);
+  color: white;
+}
+
+.jp-edu-login-btn:hover {
+  background: var(--edu-primary-dark);
+}
+
+.jp-edu-logout-btn {
+  background: var(--edu-surface-color);
+  color: var(--edu-text-secondary);
+  border: 1px solid var(--edu-border-color);
+}
+
+.jp-edu-logout-btn:hover {
+  background: var(--edu-error-color);
+  color: white;
+  border-color: var(--edu-error-color);
+}
+
+/* ===== 登入對話框 ===== */
+.jp-edu-login-dialog {
+  padding: 16px;
+  min-width: 300px;
+}
+
+.jp-edu-form-group {
+  margin-bottom: 16px;
+}
+
+.jp-edu-form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-form-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--edu-border-color);
+  border-radius: var(--edu-border-radius);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.jp-edu-form-group input:focus {
+  outline: none;
+  border-color: var(--edu-primary-color);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.jp-edu-form-note {
+  font-size: 12px;
+  color: var(--edu-text-secondary);
+  margin-top: 8px;
+}
+
+/* ===== ChatGPT 側邊欄 ===== */
+.jp-edu-chatgpt-sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--edu-background-color);
+}
+
+.jp-edu-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+
+.jp-edu-chat-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--edu-border-color);
+  background: var(--edu-surface-color);
+}
+
+.jp-edu-chat-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-chat-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--edu-text-secondary);
+}
+
+.jp-edu-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jp-edu-chat-message {
+  display: flex;
+  gap: 8px;
+  max-width: 90%;
+}
+
+.jp-edu-chat-message-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.jp-edu-chat-message-assistant,
+.jp-edu-chat-message-system {
+  align-self: flex-start;
+}
+
+.jp-edu-message-avatar {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.jp-edu-message-content {
+  background: var(--edu-surface-color);
+  border-radius: var(--edu-border-radius);
+  padding: 8px 12px;
+  max-width: 100%;
+}
+
+.jp-edu-chat-message-user .jp-edu-message-content {
+  background: var(--edu-primary-color);
+  color: white;
+}
+
+.jp-edu-chat-message-system .jp-edu-message-content {
+  background: #fff3e0;
+  border: 1px solid var(--edu-warning-color);
+}
+
+.jp-edu-message-text {
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.jp-edu-message-text code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.jp-edu-message-text pre {
+  margin: 8px 0;
+  padding: 8px;
+  background: #263238;
+  color: #aed581;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.jp-edu-message-text pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.jp-edu-message-time {
+  font-size: 10px;
+  color: var(--edu-text-secondary);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.jp-edu-chat-message-user .jp-edu-message-time {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.jp-edu-chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--edu-border-color);
+  background: var(--edu-surface-color);
+}
+
+/* 登入覆蓋層 */
+.jp-edu-login-overlay {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.jp-edu-login-overlay-content {
+  background: var(--edu-background-color);
+  padding: 24px 32px;
+  border-radius: var(--edu-border-radius);
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.jp-edu-login-overlay-content p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--edu-text-primary);
+}
+
+/* 串流游標動畫 */
+.jp-edu-cursor {
+  animation: blink 1s infinite;
+  color: var(--edu-primary-color);
+}
+
+@keyframes blink {
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.jp-edu-chat-input {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--edu-border-color);
+  border-radius: var(--edu-border-radius);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.jp-edu-chat-input:focus {
+  outline: none;
+  border-color: var(--edu-primary-color);
+}
+
+.jp-edu-chat-send {
+  padding: 8px 20px;
+  background: var(--edu-primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--edu-border-radius);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.jp-edu-chat-send:hover:not(:disabled) {
+  background: var(--edu-primary-dark);
+}
+
+.jp-edu-chat-send:disabled {
+  background: var(--edu-text-secondary);
+  cursor: not-allowed;
+}
+
+/* ===== 反思報告 ===== */
+.jp-edu-reflection-report {
+  padding: 20px;
+  background: var(--edu-background-color);
+  overflow-y: auto;
+}
+
+.jp-edu-report-container h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-report-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--edu-text-secondary);
+}
+
+.jp-edu-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.jp-edu-summary-card {
+  background: var(--edu-surface-color);
+  border-radius: var(--edu-border-radius);
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--edu-shadow);
+}
+
+.jp-edu-summary-card.jp-edu-success {
+  background: #e8f5e9;
+}
+
+.jp-edu-summary-card.jp-edu-error {
+  background: #ffebee;
+}
+
+.jp-edu-summary-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-summary-card.jp-edu-success .jp-edu-summary-value {
+  color: var(--edu-success-color);
+}
+
+.jp-edu-summary-card.jp-edu-error .jp-edu-summary-value {
+  color: var(--edu-error-color);
+}
+
+.jp-edu-summary-label {
+  font-size: 12px;
+  color: var(--edu-text-secondary);
+  margin-top: 4px;
+}
+
+.jp-edu-insights {
+  background: #e3f2fd;
+  border-radius: var(--edu-border-radius);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.jp-edu-insights h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: var(--edu-primary-dark);
+}
+
+.jp-edu-insights ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.jp-edu-insights li {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--edu-text-primary);
+  line-height: 1.4;
+}
+
+.jp-edu-report-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.jp-edu-chart {
+  background: var(--edu-background-color);
+  border: 1px solid var(--edu-border-color);
+  border-radius: var(--edu-border-radius);
+  min-height: 300px;
+}
+
+.jp-edu-report-message {
+  text-align: center;
+  padding: 40px;
+  color: var(--edu-text-secondary);
+}
+
+/* ===== 深色主題支援 ===== */
+body[data-jp-theme-light="false"] {
+  --edu-background-color: #1e1e1e;
+  --edu-surface-color: #2d2d2d;
+  --edu-text-primary: #e0e0e0;
+  --edu-text-secondary: #9e9e9e;
+  --edu-border-color: #424242;
+}
+
+body[data-jp-theme-light="false"] .jp-edu-message-text code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body[data-jp-theme-light="false"] .jp-edu-insights {
+  background: #1a237e;
+}
+
+body[data-jp-theme-light="false"] .jp-edu-insights h4 {
+  color: #90caf9;
+}
+
+/* ===== 全域登入覆蓋層 ===== */
+.jp-edu-global-login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.jp-edu-global-login-overlay .jp-edu-overlay-content {
+  background: var(--edu-background-color);
+  padding: 48px 64px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  max-width: 400px;
+}
+
+.jp-edu-global-login-overlay .jp-edu-overlay-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.jp-edu-global-login-overlay h2 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-global-login-overlay p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: var(--edu-text-secondary);
+  line-height: 1.5;
+}
+
+.jp-edu-overlay-login-btn {
+  padding: 12px 32px;
+  background: var(--edu-primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--edu-border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.jp-edu-overlay-login-btn:hover {
+  background: var(--edu-primary-dark);
+}
+
+/* ===== 配置對話框樣式 ===== */
+.jp-edu-config-dialog {
+  min-width: 400px;
+  padding: 8px 0;
+}
+
+.jp-edu-config-section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--edu-border-color);
+}
+
+.jp-edu-config-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.jp-edu-config-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: var(--edu-text-primary);
+}
+
+.jp-edu-config-hint {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: var(--edu-text-secondary);
+  line-height: 1.5;
+}
+
+.jp-edu-config-hint a {
+  color: var(--edu-primary-color);
+}
+
+.jp-edu-config-dialog input,
+.jp-edu-config-dialog select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--edu-border-color);
+  border-radius: var(--edu-border-radius);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.jp-edu-config-dialog input:focus,
+.jp-edu-config-dialog select:focus {
+  outline: none;
+  border-color: var(--edu-primary-color);
+}

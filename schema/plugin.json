@@ -1,0 +1,44 @@
+{
+    "title": "教學擴展",
+    "description": "JupyterLab 教學擴展設定",
+    "type": "object",
+    "properties": {
+        "showLoginOnStartup": {
+            "type": "boolean",
+            "title": "啟動時顯示登入對話框",
+            "description": "JupyterLab 啟動時是否自動顯示學生登入對話框",
+            "default": true
+        },
+        "autoAnalyzeErrors": {
+            "type": "boolean",
+            "title": "自動分析錯誤",
+            "description": "程式執行錯誤時是否自動使用 ChatGPT 分析",
+            "default": true
+        },
+        "openChatOnStartup": {
+            "type": "boolean",
+            "title": "啟動時開啟 AI 助教",
+            "description": "JupyterLab 啟動時是否自動開啟 ChatGPT 側邊欄",
+            "default": true
+        },
+        "chatGptModel": {
+            "type": "string",
+            "title": "ChatGPT 模型",
+            "description": "使用的 OpenAI 模型",
+            "default": "gpt-4o-mini",
+            "enum": [
+                "gpt-4o-mini",
+                "gpt-4o",
+                "gpt-4-turbo",
+                "gpt-3.5-turbo"
+            ]
+        },
+        "trackingEnabled": {
+            "type": "boolean",
+            "title": "啟用追蹤",
+            "description": "是否啟用學習歷程追蹤功能",
+            "default": true
+        }
+    },
+    "additionalProperties": false
+}
