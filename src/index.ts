@@ -32,6 +32,7 @@ const CommandIds = {
     openChatGPT: `${EXTENSION_ID}:open-chatgpt`,
     showLogin: `${EXTENSION_ID}:show-login`,
     showReport: `${EXTENSION_ID}:show-report`,
+    showConfig: `${EXTENSION_ID}:show-config`,
 };
 
 /**
@@ -56,10 +57,22 @@ const mainPlugin: JupyterFrontEndPlugin<void> = {
         // 這會廣播一個「未登入」的狀態變更事件
         SessionManager.initialize();
 
-        // 檢查服務狀態
+        // 檢查服務狀態並提示配置
         try {
             const health = await apiClient.healthCheck();
             console.log('[教學擴展] 服務狀態:', health);
+
+            // 如果 OpenAI 未配置，延遲顯示配置對話框
+            if (!health.openai_configured) {
+                console.log('[教學擴展] OpenAI 未配置，將顯示配置對話框');
+                // 動態載入 ConfigurationWidget
+                import('./widgets/ConfigurationWidget').then(({ ConfigurationWidget }) => {
+                    // 延遲一下，等界面穩定後再顯示
+                    setTimeout(() => {
+                        ConfigurationWidget.showConfigDialog();
+                    }, 2000);
+                });
+            }
         } catch (error) {
             console.warn('[教學擴展] 無法連接後端服務:', error);
         }
@@ -113,6 +126,15 @@ const mainPlugin: JupyterFrontEndPlugin<void> = {
             },
         });
 
+        app.commands.addCommand(CommandIds.showConfig, {
+            label: '⚙️ 擴展設定',
+            caption: '開啟教學擴展設定對話框',
+            execute: async () => {
+                const { ConfigurationWidget } = await import('./widgets/ConfigurationWidget');
+                ConfigurationWidget.showConfigDialog();
+            },
+        });
+
         // 添加到命令面板
         if (palette) {
             palette.addItem({
@@ -121,6 +143,10 @@ const mainPlugin: JupyterFrontEndPlugin<void> = {
             });
             palette.addItem({
                 command: CommandIds.showLogin,
+                category: '教學擴展',
+            });
+            palette.addItem({
+                command: CommandIds.showConfig,
                 category: '教學擴展',
             });
         }

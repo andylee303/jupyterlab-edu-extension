@@ -28,9 +28,10 @@ export class ConfigurationWidget {
                 <div class="jp-edu-form-group">
                     <label for="openai-model">模型</label>
                     <select id="openai-model">
-                        <option value="gpt-4o-mini" selected>gpt-4o-mini（推薦，較便宜）</option>
-                        <option value="gpt-4o">gpt-4o（較強，較貴）</option>
-                        <option value="gpt-3.5-turbo">gpt-3.5-turbo（舊版）</option>
+                        <option value="gpt-4o-mini">gpt-4o-mini（經濟實惠）</option>
+                        <option value="gpt-5-mini" selected>gpt-5-mini（推薦）</option>
+                        <option value="gpt-5.1-nano">gpt-5.1-nano（最新）</option>
+                        <option value="gpt-5">gpt-5（最強）</option>
                     </select>
                 </div>
             </div>
@@ -43,8 +44,12 @@ export class ConfigurationWidget {
                     <input type="text" id="supabase-url" placeholder="https://xxx.supabase.co" autocomplete="off" />
                 </div>
                 <div class="jp-edu-form-group">
-                    <label for="supabase-key">Supabase Anon Key</label>
-                    <input type="password" id="supabase-key" placeholder="eyJ..." autocomplete="off" />
+                    <label for="supabase-anon-key">Supabase Anon Key</label>
+                    <input type="password" id="supabase-anon-key" placeholder="eyJ..." autocomplete="off" />
+                </div>
+                <div class="jp-edu-form-group">
+                    <label for="supabase-service-key">Supabase Service Role Key（管理員用）</label>
+                    <input type="password" id="supabase-service-key" placeholder="eyJ..." autocomplete="off" />
                 </div>
             </div>
         `;
@@ -62,7 +67,8 @@ export class ConfigurationWidget {
             const openaiKey = (body.querySelector('#openai-key') as HTMLInputElement).value.trim();
             const openaiModel = (body.querySelector('#openai-model') as HTMLSelectElement).value;
             const supabaseUrl = (body.querySelector('#supabase-url') as HTMLInputElement).value.trim();
-            const supabaseKey = (body.querySelector('#supabase-key') as HTMLInputElement).value.trim();
+            const supabaseAnonKey = (body.querySelector('#supabase-anon-key') as HTMLInputElement).value.trim();
+            const supabaseServiceKey = (body.querySelector('#supabase-service-key') as HTMLInputElement).value.trim();
 
             if (!openaiKey) {
                 await showDialog({
@@ -82,7 +88,8 @@ export class ConfigurationWidget {
                         openai_api_key: openaiKey,
                         openai_model: openaiModel,
                         supabase_url: supabaseUrl,
-                        supabase_anon_key: supabaseKey,
+                        supabase_anon_key: supabaseAnonKey,
+                        supabase_service_role_key: supabaseServiceKey,
                     }),
                 });
 

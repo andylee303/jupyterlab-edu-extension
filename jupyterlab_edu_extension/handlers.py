@@ -454,9 +454,10 @@ class ConfigSaveHandler(BaseExtensionHandler):
         body = self.get_json_body()
         
         openai_api_key = body.get("openai_api_key", "").strip()
-        openai_model = body.get("openai_model", "gpt-4o-mini").strip()
+        openai_model = body.get("openai_model", "gpt-5-mini").strip()
         supabase_url = body.get("supabase_url", "").strip()
         supabase_anon_key = body.get("supabase_anon_key", "").strip()
+        supabase_service_role_key = body.get("supabase_service_role_key", "").strip()
         
         if not openai_api_key:
             self.write_json(
@@ -499,6 +500,8 @@ class ConfigSaveHandler(BaseExtensionHandler):
             existing_config["SUPABASE_URL"] = supabase_url
         if supabase_anon_key:
             existing_config["SUPABASE_ANON_KEY"] = supabase_anon_key
+        if supabase_service_role_key:
+            existing_config["SUPABASE_SERVICE_ROLE_KEY"] = supabase_service_role_key
         
         # 寫入配置
         with open(env_path, "w", encoding="utf-8") as f:
