@@ -281,9 +281,10 @@ export class KernelMonitor {
                 executionTimeMs,
             });
 
-            // 如果有 ChatGPT 分析且有錯誤，顯示分析結果
-            if (response.chatgpt_analysis && errorOutput) {
-                this.showAnalysisNotification(response.chatgpt_analysis);
+            // 如果有錯誤且 OpenAI 已配置，使用串流分析
+            if (response.has_error && response.openai_configured && errorOutput && sessionId) {
+                // 立即開始串流分析（非阻塞）
+                this.streamErrorAnalysis(sessionId, result.cellContent, errorOutput);
             }
         } catch (error: any) {
             console.error('[KernelMonitor] 記錄執行失敗:', error);
@@ -299,6 +300,91 @@ export class KernelMonitor {
                 });
                 document.dispatchEvent(event);
             }
+        }
+    }
+
+    /**
+     * 串流錯誤分析
+     */
+    private async streamErrorAnalysis(sessionId: string, code: string, error: string): Promise<void> {
+        // 先顯示「分析中」提示
+        this.showAnalysisNotification('🔄 **正在分析錯誤...**');
+
+        // 取得 XSRF token
+        const xsrfToken = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('_xsrf='))
+            ?.split('=')[1] || '';
+
+        try {
+            const response = await fetch('/edu-extension/api/tracking/error-analysis-stream', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRFToken': xsrfToken,
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    code: code,
+                    error: error,
+                }),
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                this.showAnalysisNotification('⚠️ 分析失敗');
+                return;
+            }
+
+            const reader = response.body?.getReader();
+            if (!reader) {
+                this.showAnalysisNotification('⚠️ 無法讀取串流');
+                return;
+            }
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let fullAnalysis = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6).trim();
+                        if (data === '[DONE]') {
+                            // 完成
+                            if (fullAnalysis) {
+                                this.showAnalysisNotification(fullAnalysis);
+                            }
+                            return;
+                        }
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.chunk) {
+                                fullAnalysis += parsed.chunk;
+                                // 即時更新顯示
+                                this.showAnalysisNotification(fullAnalysis);
+                            }
+                        } catch {
+                            // 忽略解析錯誤
+                        }
+                    }
+                }
+            }
+
+            // 處理剩餘的 buffer
+            if (fullAnalysis) {
+                this.showAnalysisNotification(fullAnalysis);
+            }
+        } catch (error) {
+            console.error('[KernelMonitor] 串流分析失敗:', error);
+            this.showAnalysisNotification('⚠️ 分析失敗');
         }
     }
 

@@ -33,7 +33,7 @@ let currentChatWidget: ChatGPTSidebarWidget | null = null;
 export class ChatGPTSidebarWidget extends Widget {
     private apiClient: ApiClient;
     private notebookTracker: INotebookTracker;
-    private messages: ChatMessage[] = [];
+    public messages: ChatMessage[] = [];
 
     private messagesContainer: HTMLElement;
     private inputElement: HTMLTextAreaElement;
@@ -115,7 +115,7 @@ export class ChatGPTSidebarWidget extends Widget {
 
         // 如果已經有監聽器，不再添加
         if (analysisEventHandler) {
-            console.log('[ChatGPTSidebar] 使用現有的全域事件監聽器');
+            console.log('[ChatGPTSidebar] 使用現有的全域事件監聯器');
             return;
         }
 
@@ -125,12 +125,23 @@ export class ChatGPTSidebarWidget extends Widget {
 
             // 使用當前的 Widget 實例
             if (currentChatWidget && SessionManager.isLoggedIn()) {
-                console.log('[ChatGPTSidebar] 收到分析事件，添加訊息');
-                currentChatWidget.addMessage({
-                    role: 'system',
-                    content: `📊 **程式執行分析**\n\n${customEvent.detail.analysis}`,
-                    timestamp: new Date(),
-                });
+                const analysis = customEvent.detail.analysis;
+                const content = `📊 **程式執行分析**\n\n${analysis}`;
+
+                // 檢查最後一條訊息是否為 system 類型（分析訊息）
+                const lastMessage = currentChatWidget.messages[currentChatWidget.messages.length - 1];
+                if (lastMessage && lastMessage.role === 'system' && lastMessage.content.includes('程式執行分析')) {
+                    // 更新最後一條訊息
+                    lastMessage.content = content;
+                    currentChatWidget.updateLastMessage(content);
+                } else {
+                    // 添加新訊息
+                    currentChatWidget.addMessage({
+                        role: 'system',
+                        content: content,
+                        timestamp: new Date(),
+                    });
+                }
             }
         };
 
@@ -177,44 +188,52 @@ export class ChatGPTSidebarWidget extends Widget {
         // 顯示載入狀態
         this.setLoading(true);
 
+        // 建立一個空的助手訊息，用於串流填充
+        const assistantMessage: ChatMessage = {
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+        };
+        this.messages.push(assistantMessage);
+        this.renderMessages();
+
         try {
             const notebookContext = this.getNotebookContext();
             const sessionId = SessionManager.getSessionId();
 
-            // 使用非串流 API（更穩定）
-            const response = await this.apiClient.chat(
+            // 使用串流 API
+            await this.apiClient.chatStream(
                 sessionId,
                 message,
-                notebookContext
+                notebookContext,
+                // onChunk: 收到每個片段時更新訊息
+                (chunk: string) => {
+                    assistantMessage.content += chunk;
+                    this.updateLastMessage(assistantMessage.content);
+                },
+                // onError: 發生錯誤時
+                (error: string) => {
+                    console.error('[ChatGPTSidebar] 串流錯誤:', error);
+                    if (error === '請先登入') {
+                        SessionManager.clearSession();
+                        assistantMessage.content = '⚠️ 會話已過期，請重新登入。';
+                    } else {
+                        assistantMessage.content = `抱歉，發生錯誤：${error}\n\n請確認 OpenAI API 已正確配置。`;
+                    }
+                    this.updateLastMessage(assistantMessage.content);
+                },
+                // onComplete: 完成時
+                () => {
+                    if (!assistantMessage.content) {
+                        assistantMessage.content = '無法取得回應，請稍後再試。';
+                        this.updateLastMessage(assistantMessage.content);
+                    }
+                }
             );
-
-            if (response.success && response.response) {
-                this.addMessage({
-                    role: 'assistant',
-                    content: response.response,
-                    timestamp: new Date(),
-                });
-            } else {
-                throw new Error(response.error || '無法取得回應');
-            }
         } catch (error: any) {
             console.error('[ChatGPTSidebar] 發送訊息失敗:', error);
-
-            // 檢查是否為登入問題
-            if (error.message === '請先登入') {
-                SessionManager.clearSession();
-                this.addMessage({
-                    role: 'system',
-                    content: '⚠️ 會話已過期，請重新登入。',
-                    timestamp: new Date(),
-                });
-            } else {
-                this.addMessage({
-                    role: 'assistant',
-                    content: `抱歉，發生錯誤：${error.message || error}\n\n請確認 OpenAI API 已正確配置。`,
-                    timestamp: new Date(),
-                });
-            }
+            assistantMessage.content = `抱歉，發生錯誤：${error.message || error}`;
+            this.updateLastMessage(assistantMessage.content);
         } finally {
             this.setLoading(false);
         }
@@ -280,6 +299,49 @@ export class ChatGPTSidebarWidget extends Widget {
             hour: '2-digit',
             minute: '2-digit',
         });
+    }
+
+    /**
+     * 重新渲染所有訊息
+     */
+    private renderMessages(): void {
+        this.messagesContainer.innerHTML = '';
+        for (const message of this.messages) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `jp-edu-chat-message jp-edu-chat-message-${message.role}`;
+
+            const avatar =
+                message.role === 'user'
+                    ? '👤'
+                    : message.role === 'assistant'
+                        ? '🤖'
+                        : '📢';
+            const formattedContent = this.formatMarkdown(message.content || '...');
+
+            messageEl.innerHTML = `
+        <div class="jp-edu-message-avatar">${avatar}</div>
+        <div class="jp-edu-message-content">
+          <div class="jp-edu-message-text">${formattedContent}</div>
+          <div class="jp-edu-message-time">${this.formatTime(message.timestamp)}</div>
+        </div>
+      `;
+            this.messagesContainer.appendChild(messageEl);
+        }
+        this.scrollToBottom();
+    }
+
+    /**
+     * 更新最後一條訊息（用於串流更新）
+     */
+    public updateLastMessage(content: string): void {
+        const lastMessageEl = this.messagesContainer.lastElementChild;
+        if (lastMessageEl) {
+            const textEl = lastMessageEl.querySelector('.jp-edu-message-text');
+            if (textEl) {
+                textEl.innerHTML = this.formatMarkdown(content);
+            }
+        }
+        this.scrollToBottom();
     }
 
     /**

@@ -77,41 +77,17 @@ class ChatGPTService:
             if cached:
                 return cached
 
-        system_prompt = """你是一位親切的程式教學助教，專門幫助初學者理解程式錯誤。
+        system_prompt = """你是程式教學助教。用繁體中文簡潔地解釋錯誤並給出修正建議。
+格式：
+🔍 錯誤：（一句話說明）
+✅ 修正：（具體修正方式）
+💡 提示：（一個學習重點）"""
 
-你的任務是：
-1. 用繁體中文解釋錯誤訊息的含義
-2. 指出程式碼中導致錯誤的具體位置
-3. 提供修正建議
-4. 如果適合，給予學習相關概念的提示
-
-請使用簡潔、易懂的語言，避免過於專業的術語。
-回應格式：
-## 🔍 錯誤說明
-（錯誤類型與原因說明）
-
-## 📍 問題位置
-（指出程式碼中的問題）
-
-## ✅ 修正建議
-（具體的修正方式）
-
-## 💡 學習提示
-（相關概念或常見陷阱）
-"""
-
-        user_message = f"""請分析以下程式碼的錯誤：
-
-**程式碼：**
+        user_message = f"""程式碼：
 ```python
-{code}
+{code[:500]}
 ```
-
-**錯誤訊息：**
-```
-{error}
-```
-"""
+錯誤：{error[:300]}"""
 
         try:
             response = await self.client.chat.completions.create(
@@ -120,6 +96,7 @@ class ChatGPTService:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message},
                 ],
+                max_completion_tokens=4096,  # 限制回應長度
             )
 
             result = response.choices[0].message.content or "無法分析此錯誤"
@@ -132,6 +109,62 @@ class ChatGPTService:
 
         except Exception as e:
             return f"分析錯誤時發生問題：{e!s}"
+
+    async def analyze_error_stream(
+        self, code: str, error: str
+    ) -> AsyncIterator[str]:
+        """串流分析程式錯誤
+
+        Args:
+            code: 程式碼內容
+            error: 錯誤訊息
+
+        Yields:
+            串流的文字片段
+        """
+        # 檢查快取
+        cache_key = self._error_cache.make_key(code.strip(), error.strip())
+        cached = self._error_cache.get(cache_key)
+        if cached:
+            yield cached
+            return
+
+        system_prompt = """你是程式教學助教。用繁體中文簡潔地解釋錯誤並給出修正建議。
+格式：
+🔍 錯誤：（一句話說明）
+✅ 修正：（具體修正方式）
+💡 提示：（一個學習重點）"""
+
+        user_message = f"""程式碼：
+```python
+{code[:500]}
+```
+錯誤：{error[:300]}"""
+
+        full_response = ""
+        try:
+            stream = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message},
+                ],
+                max_completion_tokens=4096,
+                stream=True,
+            )
+
+            async for chunk in stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    content = chunk.choices[0].delta.content
+                    full_response += content
+                    yield content
+
+            # 儲存到快取
+            if full_response:
+                self._error_cache.set(cache_key, full_response)
+
+        except Exception as e:
+            yield f"分析錯誤時發生問題：{e!s}"
 
     async def analyze_code(self, code: str, context: str | None = None) -> str:
         """分析程式碼

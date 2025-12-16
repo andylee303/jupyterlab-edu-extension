@@ -178,16 +178,6 @@ class TrackingExecutionHandler(BaseExtensionHandler):
         execution_time_ms = body.get("execution_time_ms", 0)
 
         settings = get_settings()
-        chatgpt_analysis = None
-
-        # 如果有錯誤且 OpenAI 已配置，進行分析
-        if error_output and settings.is_openai_configured:
-            chatgpt_service = ChatGPTService()
-            chatgpt_analysis = await chatgpt_service.analyze_error(
-                code=cell_content,
-                error=error_output,
-                use_cache=True,  # 使用快取
-            )
 
         # 背景記錄到資料庫（非阻塞）
         if settings.is_supabase_configured and session_id:
@@ -198,13 +188,15 @@ class TrackingExecutionHandler(BaseExtensionHandler):
                 execution_count=execution_count,
                 output=output,
                 error_output=error_output,
-                chatgpt_analysis=chatgpt_analysis,
+                chatgpt_analysis=None,  # 分析由前端串流請求
                 execution_time_ms=execution_time_ms,
             ))
 
+        # 告知前端是否需要進行錯誤分析
         self.write_json({
             "success": True,
-            "chatgpt_analysis": chatgpt_analysis,
+            "has_error": bool(error_output),
+            "openai_configured": settings.is_openai_configured,
         })
 
     async def _log_execution_background(self, **kwargs):
@@ -214,6 +206,63 @@ class TrackingExecutionHandler(BaseExtensionHandler):
             await tracking_service.log_execution(**kwargs)
         except Exception as e:
             print(f"[TrackingExecutionHandler] 背景記錄失敗: {e}")
+
+
+class ErrorAnalysisStreamHandler(BaseExtensionHandler):
+    """串流錯誤分析 API (SSE)"""
+
+    @web.authenticated
+    async def post(self):
+        """串流分析程式錯誤"""
+        body = self.get_json_body()
+        session_id = body.get("session_id")
+        code = body.get("code", "")
+        error = body.get("error", "")
+
+        # 檢查登入
+        if not session_id or not get_session(session_id):
+            self.write_json({
+                "success": False,
+                "error": "請先登入",
+                "error_code": "NOT_LOGGED_IN",
+            }, status=401)
+            return
+
+        settings = get_settings()
+        if not settings.is_openai_configured:
+            self.write_json({
+                "success": False,
+                "error": "OpenAI API 未配置",
+            }, status=503)
+            return
+
+        # 設定 SSE 標頭
+        self.set_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.set_header("Cache-Control", "no-cache")
+        self.set_header("Connection", "keep-alive")
+        self.set_header("X-Accel-Buffering", "no")
+
+        chatgpt_service = ChatGPTService()
+
+        try:
+            async for chunk in chatgpt_service.analyze_error_stream(code, error):
+                # SSE 格式
+                data = json.dumps({"chunk": chunk}, ensure_ascii=False)
+                self.write(f"data: {data}\n\n")
+                await self.flush()
+
+            # 發送完成訊號
+            self.write("data: [DONE]\n\n")
+            await self.flush()
+
+        except StreamClosedError:
+            pass  # 客戶端關閉連線
+        except Exception as e:
+            error_data = json.dumps({"error": str(e)}, ensure_ascii=False)
+            self.write(f"data: {error_data}\n\n")
+            await self.flush()
+
+        self.finish()
 
 
 class ChatGPTAnalyzeHandler(BaseExtensionHandler):
@@ -537,6 +586,10 @@ def setup_handlers(web_app):
         (
             url_path_join(base_url, "edu-extension", "api", "tracking", "execution"),
             TrackingExecutionHandler,
+        ),
+        (
+            url_path_join(base_url, "edu-extension", "api", "tracking", "error-analysis-stream"),
+            ErrorAnalysisStreamHandler,
         ),
         # ChatGPT
         (

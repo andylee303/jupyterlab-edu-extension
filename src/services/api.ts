@@ -266,10 +266,17 @@ export class ApiClient {
         const url = URLExt.join(this.baseUrl, 'chatgpt/stream');
 
         try {
+            // 取得 XSRF token
+            const xsrfToken = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('_xsrf='))
+                ?.split('=')[1] || '';
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-XSRFToken': xsrfToken,
                 },
                 body: JSON.stringify({
                     session_id: sessionId,
