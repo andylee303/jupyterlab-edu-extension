@@ -165,9 +165,31 @@ export OPENAI_API_KEY="sk-your-api-key-here"
 jupyter lab
 ```
 
-**方法 C：使用 .env 檔案（開發環境）**
+**方法 C：使用 .env 檔案（永久設定）**
 
-在 JupyterLab 工作目錄中建立 `.env` 檔案：
+系統會自動搜尋以下位置的 `.env` 檔案：
+
+1. **用戶配置目錄（推薦）**：
+   - Windows: `C:\Users\您的用戶名\.jupyterlab-edu-extension\.env`
+   - macOS/Linux: `~/.jupyterlab-edu-extension/.env`
+
+2. JupyterLab 啟動時的當前目錄
+
+建立配置目錄並設定 `.env`：
+
+```powershell
+# Windows PowerShell
+mkdir "$env:USERPROFILE\.jupyterlab-edu-extension" -Force
+notepad "$env:USERPROFILE\.jupyterlab-edu-extension\.env"
+```
+
+```bash
+# macOS/Linux
+mkdir -p ~/.jupyterlab-edu-extension
+nano ~/.jupyterlab-edu-extension/.env
+```
+
+在 `.env` 檔案中輸入：
 
 ```
 OPENAI_API_KEY=sk-your-api-key-here
