@@ -104,3 +104,8 @@ coverage/
 # =====================
 .eslintcache
 .stylelintcache
+
+# =====================
+# Test Directories
+# =====================
+test_install*/
