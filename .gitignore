@@ -39,7 +39,8 @@ env/
 # =====================
 # JupyterLab Extension
 # =====================
-jupyterlab_edu_extension/labextension/
+# 注意：labextension 目錄需要被提交，這樣用戶安裝時不需要 Node.js
+# jupyterlab_edu_extension/labextension/  # 保留預編譯版本
 jupyterlab_edu_extension/_version.py
 lib/
 node_modules/

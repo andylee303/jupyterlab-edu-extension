@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjupyterlab_edu_extension=self.webpackChunkjupyterlab_edu_extension||[]).push([[631],{631:(e,u,s)=>{s.r(u),s(966)}}]);
