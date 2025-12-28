@@ -137,27 +137,82 @@ jupyter lab
 
 ### 開發環境設置
 
-```bash
-# 複製專案
+#### 前置需求
+
+- **Python 3.11+**
+- **Node.js 18+** 和 npm（開發時需要）
+- **Git**
+
+#### Windows 開發環境
+
+```powershell
+# 1. 複製專案
 git clone https://github.com/andylee303/jupyterlab-edu-extension.git
 cd jupyterlab-edu-extension
 
-# 設置環境變數
-cp .env.example .env
+# 2. 設置環境變數
+copy .env.example .env
 # 編輯 .env 填入 API 金鑰
 
-# 建立虛擬環境
+# 3. 建立虛擬環境
 python -m venv .venv
-.venv\Scripts\activate  # Windows
-# source .venv/bin/activate  # macOS/Linux
+.\.venv\Scripts\activate
 
-# 安裝依賴
-pip install -e .
+# 4. 安裝 Python 依賴（開發模式）
+pip install -e ".[dev]"
+
+# 5. 安裝 Node.js 依賴並建置前端
 npm install
 npm run build
 
-# 啟動開發伺服器
+# 6. 啟動開發伺服器
 jupyter lab
+```
+
+#### macOS/Linux 開發環境
+
+```bash
+# 1. 複製專案
+git clone https://github.com/andylee303/jupyterlab-edu-extension.git
+cd jupyterlab-edu-extension
+
+# 2. 設置環境變數
+cp .env.example .env
+# 編輯 .env 填入 API 金鑰
+
+# 3. 建立虛擬環境
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 4. 安裝 Python 依賴（開發模式）
+pip install -e ".[dev]"
+
+# 5. 安裝 Node.js 依賴並建置前端
+npm install
+npm run build
+
+# 6. 啟動開發伺服器
+jupyter lab
+```
+
+### 開發工作流程
+
+```bash
+# 監看模式（自動重新編譯）
+npm run watch
+
+# 在另一個終端啟動 JupyterLab
+jupyter lab --autoreload
+```
+
+### 程式碼檢查與格式化
+
+```bash
+# TypeScript 檢查
+npm run lint:check
+
+# Python 檢查 (使用 Ruff)
+ruff check jupyterlab_edu_extension/
 ```
 
 ### 發布到 PyPI

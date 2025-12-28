@@ -9,9 +9,9 @@
     "education",
     "chatgpt"
   ],
-  "homepage": "https://github.com/your-repo/jupyterlab-edu-extension",
+  "homepage": "https://github.com/andylee303/jupyterlab-edu-extension",
   "bugs": {
-    "url": "https://github.com/your-repo/jupyterlab-edu-extension/issues"
+    "url": "https://github.com/andylee303/jupyterlab-edu-extension/issues"
   },
   "license": "MIT",
   "author": {
@@ -26,7 +26,7 @@
   "style": "style/index.css",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-repo/jupyterlab-edu-extension.git"
+    "url": "https://github.com/andylee303/jupyterlab-edu-extension.git"
   },
   "scripts": {
     "build": "jlpm build:lib && jlpm build:labextension:dev",

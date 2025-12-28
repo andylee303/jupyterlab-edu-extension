@@ -98,6 +98,7 @@ coverage/
 .pnp.loader.mjs
 .pnp.cjs
 .yarn/
+yarn.lock
 
 # =====================
 # Misc
